@@ -1,0 +1,67 @@
+:root{
+    --bg-color:#0271ff;
+}
+.Body{
+    background-color:#0271ff;
+    height: 100vh;
+    display: flex;
+   align-items: center;
+    flex-direction: column;
+  
+    padding: 2rem;
+    gap: 1rem;
+}
+.home-logo{
+    position: relative;
+   
+    
+    width: 15rem;
+    height: auto;
+}
+.home-logo img{
+    
+    position: relative;
+    width: 100%;
+}
+.color-red{
+    color: #eb1111;
+}
+.link{
+    color: white;
+    text-decoration: none;
+}
+.container{
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+}
+.form-container{
+   
+    width: 50vw;
+   
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.form-container Form{
+  
+    
+    width: 25rem;
+    
+
+    
+}
+.form-container Form Button{
+    margin-top: 1rem;
+}
+.bold{
+    font-weight: bold;
+    
+}
+.color-white{
+    color: white;
+}

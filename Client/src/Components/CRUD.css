@@ -1,0 +1,100 @@
+.crud-body{
+    
+    border-radius: 1rem;
+    position: relative;
+   background-color: dodgerblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 50vw;
+    height: auto;
+    border: 1px solid red;
+    
+}
+.logo{
+   
+    width: 10rem;
+    height: 120px;
+}
+ .logo img{
+    width: 100px;
+}
+.crud-form-container{
+   
+  
+    width: 50vw;
+    padding-top:1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.crud-form-container Form{
+  
+  
+    width:auto;
+}
+.crud-form-container Form Button{
+    margin-top: 1rem;
+}
+.crud-display-none{
+   
+    transform: scale(0);
+    width: 0vw;
+    height: 0vh;
+    opacity: 0;
+    display: none;
+    transition: 0.5s;
+}
+.crud-display-block{
+    transform: scale(1);
+    transition: 0.2s;
+}
+.display-flex{
+    border: 1px solid red;
+    display: flex;
+    
+}
+.width-20{
+    width: 40rem;
+}
+.custom{
+    border: 1px solid red;
+    background-color: transparent;
+}
+.update-form{
+    border: none;
+    text-align: center;
+    background-color: transparent;
+}
+.update-alert{
+    border: 1px solid red;
+}
+.form-body{
+    display: flex;
+    gap: 1rem;
+}
+.room-info,.guest-info{
+   
+}
+.room-info{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.btnAddRoom{
+    width: 5rem;
+}
+.rooms{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    gap: 1rem;
+    
+}
+.flex{
+    display: flex;
+    width: 15rem;
+}
