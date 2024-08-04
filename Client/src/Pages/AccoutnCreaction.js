@@ -2,7 +2,11 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { Link, useAsyncError } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClipboard, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClipboard,
+  faCircleCheck,
+  faN,
+} from "@fortawesome/free-solid-svg-icons";
 import { ClipLoader } from "react-spinners";
 import Button from "react-bootstrap/Button";
 import Logo from "../Resources/sanda.jpg";
@@ -26,11 +30,17 @@ export default function AccountCreate() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(true);
   const [users, setUsers] = useState([]);
-  const [fnameExist, setfnameExist] = useState(false);
-  const [lnameExist, setlnameExist] = useState(false);
-  const [emailExist, setEmailExist] = useState(false);
   const [isCreated, setCreated] = useState(false);
-  const [valid,setValide]=useState(true);
+  const [valid, setValide] = useState(true);
+
+  /*  */
+  const [nameExist, setNameExist] = useState(false);
+  const [validEmail, setValidEmail] = useState(true);
+  const [validTp, setValidTp] = useState(true);
+  const [validPw, setValidPw] = useState(true);
+  const [erMsg,setErMsg]=useState("");
+
+  /* Get currunt employe's Details */
   useEffect(() => {
     axios
       .get("http://localhost:8080/Employes")
@@ -43,24 +53,7 @@ export default function AccountCreate() {
       });
   }, []);
 
-  useEffect(
-    (event) => {
-      setfnameExist(users.some((user) => user.firstName === firstName));
-      setlnameExist(users.some((user) => user.lastName === lastName));
-      setEmailExist(users.some((user) => user.eMail === email + "@gmail.com"));
-    },
-    [firstName, lastName, email]
-  );
-  const validate=()=>{
-    if(isNaN(contactNo)){
-      return false;
-    }
-    
-  }
-
-  /* const addProfileImage = (event) => {
-    setProfileImg(event.target.files[0]);
-  }; */
+  /* Set Values */
   const addProfileImage = (event) => {
     setProfileImg(event.target.value);
   };
@@ -86,10 +79,117 @@ export default function AccountCreate() {
     setPassword(event.target.value);
   };
 
+  /* Validate user information */
+
+/* check user Name exsist */
+  const isUserNameValid = (firstName, lastName) => {
+    users.forEach((user) => {
+      const fName = user.firstName.toString();
+      const lName = user.lastName.toString();
+      if (
+        fName.toLowerCase() == firstName.toLowerCase() &&
+        lName.toLowerCase() == lastName.toLowerCase()
+      ) {
+        setNameExist(true);
+        setValide(false);
+      } else {
+        setNameExist(false);
+        setValide(true);
+      }
+    });
+  };
+  useEffect(() => {
+    isUserNameValid(firstName, lastName);
+  }, [firstName, lastName]);
+
+  /* Check Email  */
+  const isEmailValid = (email) => {
+    
+    if(email.includes("@")){
+      setValide(false);
+      setValidEmail(false);
+
+    }else{
+      setValidEmail(true);
+      setValide(true);
+    }
+  };
+  useEffect(() => {
+    isEmailValid(email);
+  }, [email]);
+
+  /* Check check contact No */
+  const isTpValid = (contactNo) => {
+    
+    const regex=/^\d{10}$/
+    if(!regex.test(contactNo)){
+        setValidTp(false);
+        setValide(false);
+    }else{
+      setValide(true);
+      setValidTp(true);
+    }
+  };
+ 
+    
+  const handleOnTpValidation=()=>{
+      isTpValid(contactNo);
+  }
+  const handleOnChange=(e)=>{
+   
+      setValide(true);
+      setValidTp(true);
+    
+  }
+  
+  /* Check Password  */
+
+  const checkPw=(password)=>{
+    
+    if(password.length<8){
+      setErMsg("Password too Weak! Password should contain more than 8 characters")
+      setValidPw(false);
+      setValide(false);
+    }
+    else if(!/[a-z]/.test(password)){
+      setErMsg("Password too Weak! Password should contain at least one lower case letter")
+        setValidPw(false);
+        setValide(false);
+    }
+    else if(!/[A-Z]/.test(password)){
+      setErMsg("Password too Weak! Password should contain at least one upper case letter")
+      setValidPw(false);
+      setValide(false);
+    }else if(!/[0-9]/.test(password)){
+      setErMsg("Password too Weak! Password should contain at least one number")
+      setValidPw(false);
+      setValide(false);
+    }else if(!/[^A-Za-z0-9]/.test(password)){
+      setErMsg("Password too Weak! Password should contain at least one special character")
+      setValidPw(false);
+      setValide(false);
+    }
+    else{
+      setValidPw(true);
+      setValide(true);
+    }
+  }
+
+  const handlePwValidation=()=>{
+    checkPw(password);
+  }
+  const handlePwChanges=(e)=>{
+    console.log(password);
+    setValidPw(true);
+    setValide(true);
+  }
+  /* Submit data */
+
   const handleSubmit = (event) => {
     event.preventDefault();
+
     const form = event.currentTarget;
-    if (!form.checkValidity() || (fnameExist && lnameExist) || emailExist || (isNaN(contactNo))) {
+    if (!form.checkValidity() || !valid) {
       event.preventDefault();
       event.stopPropagation();
     } else {
@@ -102,7 +202,7 @@ export default function AccountCreate() {
       formData.append("contactNo", contactNo);
       formData.append("position", position);
       formData.append("password", password);
-      formData.append("availability","available")
+      formData.append("availability", "available");
 
       axios
         .post("http://localhost:8080/Employes/add-employe", formData, {
@@ -135,9 +235,6 @@ export default function AccountCreate() {
     setValidated(true);
   };
 
-  const create = () => {
-    setCreated(true);
-  };
   return (
     <div className="create-account-body">
       <section className={isCreated ? "form-Body blur" : "form-Body"}>
@@ -149,24 +246,34 @@ export default function AccountCreate() {
         </section>
         <section className="form-panel">
           <h1>Create New Account</h1>
-          {fnameExist && lnameExist ? (
-            <Alert variant="danger" onClose={() => setShow(false)} dismissible>
-              <Alert.Heading>
-                Oh snap! this User name already exist!
-              </Alert.Heading>
+         {nameExist ? 
+            <Alert key="danger" variant="danger" >
+              User Name Exist
             </Alert>
-          ) : (
+            :
             <></>
-          )}
-          {emailExist ? (
-            <Alert variant="danger" onClose={() => setShow(false)} dismissible>
-              <Alert.Heading>
-                Oh snap! this email address already exist!
-              </Alert.Heading>
+        }
+        {!validEmail ? 
+            <Alert key="danger" variant="danger" >
+              Email is Not Valid
             </Alert>
-          ) : (
+            :
             <></>
-          )}
+        }
+         {!validTp ? 
+            <Alert key="danger" variant="danger" >
+              Contact Number is Not Valid
+            </Alert>
+            :
+            <></>
+        }
+          {!validPw ? 
+            <Alert key="danger" variant="danger" >
+              {erMsg}
+            </Alert>
+            :
+            <></>
+        }
           <div className="form-container">
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
               <Form.Group>
@@ -177,11 +284,13 @@ export default function AccountCreate() {
                   onChange={(e) => {
                     addProfileImage(e);
                   }}
+                  placeholder="Profile Picture"
                   required
                 />
-                <Form.Control.Feedback type="invalid" className="bold">
-                  add a profile
-                </Form.Control.Feedback>
+                <Form.Control.Feedback
+                  type="invalid"
+                  className="bold"
+                ></Form.Control.Feedback>
               </Form.Group>
               <Form.Group>
                 <Form.Label htmlFor="firstName" />
@@ -195,7 +304,7 @@ export default function AccountCreate() {
                   required
                 />
                 <Form.Control.Feedback type="invalid" className="bold">
-                  Enter your name
+                  Cannot be empty!
                 </Form.Control.Feedback>
               </Form.Group>
 
@@ -204,6 +313,7 @@ export default function AccountCreate() {
                 <Form.Control
                   type="text"
                   id="lastName"
+                  value={lastName}
                   onChange={(e) => {
                     addLastName(e);
                   }}
@@ -221,9 +331,11 @@ export default function AccountCreate() {
                   <Form.Control
                     type="text"
                     id="mail"
+                    value={email}
                     placeholder="email"
                     onChange={(e) => {
                       addEmail(e);
+                      
                     }}
                     required
                   />
@@ -237,18 +349,19 @@ export default function AccountCreate() {
               <Form.Group>
                 <Form.Label htmlFor="contact" />
                 <Form.Control
-                  type="tel"
+                  type="text"
                   id="contact"
+                  value={contactNo}
                   onChange={(e) => {
                     addContactNo(e);
+                    handleOnChange(e);
                   }}
-                  pattern="[0-9]*"
                   placeholder="Contact No"
-                  
+                  onBlur={handleOnTpValidation}
                   required
                 />
                 <Form.Control.Feedback type="invalid" className="bold">
-                  {isNaN(contactNo) ? <>Enter Valid contact number</> : <>Enter your contact number</>}
+                  Enter your contact number
                 </Form.Control.Feedback>
               </Form.Group>
 
@@ -270,10 +383,15 @@ export default function AccountCreate() {
 
               <Form.Group>
                 <Form.Label htmlFor="position">Position</Form.Label>
-                <Form.Select id="position" onChange={(e) => {addPosition(e);}} required>
+                <Form.Select
+                  id="position"
+                  onChange={(e) => {
+                    addPosition(e);
+                  }}
+                  required
+                >
                   <option value="">Select Position</option>
                   <option value="position1">Admin</option>
-                 
                 </Form.Select>
                 <Form.Control.Feedback type="invalid" className="bold">
                   Enter Correct Position
@@ -285,17 +403,20 @@ export default function AccountCreate() {
                 <Form.Control
                   type="password"
                   id="pw"
+                  value={password}
                   onChange={(e) => {
                     addpassword(e);
+                    handlePwChanges(e);
                   }}
                   placeholder="password"
+                  onBlur={handlePwValidation}
                   required
                 />
                 <Form.Control.Feedback type="invalid" className="bold">
                   Enter Correct Password
                 </Form.Control.Feedback>
               </Form.Group>
-              <Button type="submit" className="btnCreate" >
+              <Button type="submit" className="btnCreate">
                 <div className="bold">Create</div>
               </Button>
             </Form>

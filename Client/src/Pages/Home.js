@@ -21,6 +21,7 @@ export default function Home(){
     const [validPw,setValidPw]=useState(true);
     const[idErr,setIdErr]=useState(false);
     const[pwErr,setPwErr]=useState(false);
+    const [retry,setRetry]=useState(false);
     const navigate = useNavigate();
    
     useEffect(()=>{
@@ -85,12 +86,15 @@ export default function Home(){
         }
         else if(!validId){
             setIdErr(true);
+
             console.log("invalid id");
+            setRetry(true);
             event.stopPropagation();
         }
         else if(!validPw){
             setPwErr(true)
             console.log("invalid password");
+            setRetry(true);
             event.stopPropagation();
         }
         else{
@@ -105,6 +109,11 @@ export default function Home(){
         console.log(`ID->${empId}`)
         
       }
+      const refresh=()=>{
+      window.location.reload();
+         
+      }
+      
     return(
         <div>
             <section className="Body">
@@ -139,7 +148,7 @@ export default function Home(){
                       <Form.Control.Feedback type="invalid" className="bold">Enter Correct Password</Form.Control.Feedback>
                     
                   </Form.Group>
-                {loaded ?  <Button type="submit" > Log in</Button> :  <Button type="submit" disabled> Log in</Button>}
+                {!retry ?  <Button type="submit" > Log in</Button> :  <Button variant="danger" onClick={refresh}> Retry</Button>}
               </Form>
              
                  
